@@ -8,9 +8,10 @@ import lombok.Getter;
 
 import java.util.*;
 
-@Getter
 public class Branch {
+    @Getter
     private final Id id;
+    @Getter
     private Name name;
     private final List<Product> products;
 
@@ -18,6 +19,10 @@ public class Branch {
         this.id = id;
         this.name = name;
         this.products = products == null ? new ArrayList<>() : new ArrayList<>(products);
+    }
+
+    public List<Product> getProducts() {
+        return Collections.unmodifiableList(products);
     }
 
     public void updateName(Name name) {
@@ -60,7 +65,7 @@ public class Branch {
 
     public List<Product> topStockProducts() {
         if (products.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         int maxStock = products.stream()

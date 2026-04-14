@@ -5,7 +5,16 @@ import com.springboot.reactor.pruebaaccenture.application.dto.response.Franchise
 import com.springboot.reactor.pruebaaccenture.application.dto.response.ProductResponse;
 import com.springboot.reactor.pruebaaccenture.application.dto.response.TopStockProductResponse;
 import com.springboot.reactor.pruebaaccenture.application.mapper.FranchiseMapper;
-import com.springboot.reactor.pruebaaccenture.application.port.in.*;
+import com.springboot.reactor.pruebaaccenture.application.port.in.AddBranchUseCase;
+import com.springboot.reactor.pruebaaccenture.application.port.in.AddProductUseCase;
+import com.springboot.reactor.pruebaaccenture.application.port.in.CreateFranchiseUseCase;
+import com.springboot.reactor.pruebaaccenture.application.port.in.DeleteProductUseCase;
+import com.springboot.reactor.pruebaaccenture.application.port.in.GetAllFranchisesUseCase;
+import com.springboot.reactor.pruebaaccenture.application.port.in.GetTopStockByFranchiseUseCase;
+import com.springboot.reactor.pruebaaccenture.application.port.in.UpdateBranchNameUseCase;
+import com.springboot.reactor.pruebaaccenture.application.port.in.UpdateFranchiseNameUseCase;
+import com.springboot.reactor.pruebaaccenture.application.port.in.UpdateProductNameUseCase;
+import com.springboot.reactor.pruebaaccenture.application.port.in.UpdateProductStockUseCase;
 import com.springboot.reactor.pruebaaccenture.application.port.out.FranchisePersistencePort;
 import com.springboot.reactor.pruebaaccenture.domain.exception.DuplicateNameException;
 import com.springboot.reactor.pruebaaccenture.domain.exception.FranchiseNotFoundException;
@@ -20,6 +29,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class FranchiseService implements
@@ -47,10 +57,10 @@ public class FranchiseService implements
     public Mono<BranchResponse> addBranch(String franchiseId, String branchName) {
         return loadFranchise(franchiseId)
                 .flatMap(franchise -> {
-                    Branch newBranch = new Branch(Id.newId(), new Name(branchName), new ArrayList<>());
+                    Branch newBranch = new Branch(Id.newId(), new Name(branchName), List.of());
                     franchise.addBranch(newBranch);
                     return persistencePort.save(franchise)
-                            .thenReturn(FranchiseMapper.toResponse(newBranch));
+                            .map(saved -> FranchiseMapper.toResponse(newBranch));
                 });
     }
 
@@ -77,16 +87,14 @@ public class FranchiseService implements
 
     @Override
     public Mono<ProductResponse> updateProductStock(String franchiseId, String branchId, String productId, int stock) {
+        Id branch = new Id(branchId);
+        Id product = new Id(productId);
+
         return loadFranchise(franchiseId)
                 .flatMap(franchise -> {
-                    franchise.updateStock(new Id(branchId), new Id(productId), new Stock(stock));
+                    franchise.updateStock(branch, product, new Stock(stock));
                     return persistencePort.save(franchise)
-                            .thenReturn(FranchiseMapper.toResponse(
-                                    franchise.getBranches().stream()
-                                            .filter(branch -> branch.getId().value().equals(branchId))
-                                            .findFirst().orElseThrow()
-                                            .findProduct(new Id(productId))
-                            ));
+                            .map(saved -> FranchiseMapper.toResponse(saved.findProduct(branch, product)));
                 });
     }
 
@@ -107,34 +115,26 @@ public class FranchiseService implements
 
     @Override
     public Mono<BranchResponse> updateBranchName(String franchiseId, String branchId, String name) {
+        Id branch = new Id(branchId);
+
         return loadFranchise(franchiseId)
                 .flatMap(franchise -> {
-                    franchise.updateBranchName(new Id(branchId), new Name(name));
-
+                    franchise.updateBranchName(branch, new Name(name));
                     return persistencePort.save(franchise)
-                            .thenReturn(FranchiseMapper.toResponse(
-                                    franchise.getBranches().stream()
-                                            .filter(branch -> branch.getId().value().equals(branchId))
-                                            .findFirst()
-                                            .orElseThrow()
-                            ));
+                            .map(saved -> FranchiseMapper.toResponse(saved.findBranch(branch)));
                 });
     }
 
     @Override
     public Mono<ProductResponse> updateProductName(String franchiseId, String branchId, String productId, String name) {
+        Id branch = new Id(branchId);
+        Id product = new Id(productId);
+
         return loadFranchise(franchiseId)
                 .flatMap(franchise -> {
-                    franchise.updateProductName(new Id(branchId), new Id(productId), new Name(name));
-
+                    franchise.updateProductName(branch, product, new Name(name));
                     return persistencePort.save(franchise)
-                            .thenReturn(FranchiseMapper.toResponse(
-                                    franchise.getBranches().stream()
-                                            .filter(branch -> branch.getId().value().equals(branchId))
-                                            .findFirst()
-                                            .orElseThrow()
-                                            .findProduct(new Id(productId))
-                            ));
+                            .map(saved -> FranchiseMapper.toResponse(saved.findProduct(branch, product)));
                 });
     }
 

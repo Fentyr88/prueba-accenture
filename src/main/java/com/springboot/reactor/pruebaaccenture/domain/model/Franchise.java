@@ -8,12 +8,14 @@ import com.springboot.reactor.pruebaaccenture.domain.vo.Stock;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-@Getter
 public class Franchise {
 
+    @Getter
     private final Id id;
+    @Getter
     private Name name;
     private final List<Branch> branches;
 
@@ -21,6 +23,10 @@ public class Franchise {
         this.id = id;
         this.name = name;
         this.branches = branches == null ? new ArrayList<>() : new ArrayList<>(branches);
+    }
+
+    public List<Branch> getBranches() {
+        return Collections.unmodifiableList(branches);
     }
 
     public void updateName(Name name) {
@@ -43,6 +49,10 @@ public class Franchise {
                 .orElseThrow(() -> new BranchNotFoundException(branchId.value()));
     }
 
+    public Product findProduct(Id branchId, Id productId) {
+        return findBranch(branchId).findProduct(productId);
+    }
+
     public void addProduct(Id branchId, Product product) {
         findBranch(branchId).addProduct(product);
     }
@@ -52,7 +62,8 @@ public class Franchise {
     }
 
     public void updateStock(Id branchId, Id productId, Stock stock) {
-        findBranch(branchId).findProduct(productId).updateStock(stock);
+        Product product = findProduct(branchId, productId);
+        product.updateStock(stock);
     }
 
     public void updateBranchName(Id branchId, Name updatedName) {
