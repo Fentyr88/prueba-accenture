@@ -1,10 +1,10 @@
 package com.springboot.reactor.pruebaaccenture.application.port.in;
 
-import com.springboot.reactor.pruebaaccenture.application.dto.response.FranchiseResponse;
+import com.springboot.reactor.pruebaaccenture.application.dto.response.ProductResponse;
 import reactor.core.publisher.Mono;
 
 public interface AddProductUseCase {
 
-    Mono<FranchiseResponse> addProduct(String franchiseId, String branchId, String productName, int stock);
+    Mono<ProductResponse> addProduct(String franchiseId, String branchId, String productName, int stock);
 }
 

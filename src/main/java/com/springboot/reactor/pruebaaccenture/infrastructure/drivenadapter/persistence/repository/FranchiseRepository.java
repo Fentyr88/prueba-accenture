@@ -129,25 +129,20 @@ public class FranchiseRepository {
             return Mono.just(false);
         }
 
-        String trimmed = name.trim();
-
-        Expression expression = Expression.builder()
-                .expression(ENTITY_TYPE + " = :type AND #nm = :name")
-                .expressionNames(Map.of("#nm", "name"))
-                .expressionValues(Map.of(
-                        ":type", AttributeValue.builder().s(ENTITY_TYPE_FRANCHISE).build(),
-                        ":name", AttributeValue.builder().s(trimmed).build()
-                ))
-                .build();
+        String searchName = name.trim().toLowerCase();
 
         ScanEnhancedRequest request = ScanEnhancedRequest.builder()
-                .filterExpression(expression)
-                .limit(1)
+                .filterExpression(Expression.builder()
+                        .expression(ENTITY_TYPE + " = :type")
+                        .expressionValues(Map.of(
+                                ":type", AttributeValue.builder().s(ENTITY_TYPE_FRANCHISE).build()
+                        ))
+                        .build())
                 .build();
 
         return Flux.from(franchiseTable.scan(request))
                 .flatMapIterable(Page::items)
-                .hasElements();
+                .any(entity -> entity.getName() != null && entity.getName().toLowerCase().equals(searchName));
     }
 
     private Mono<ExistingAggregate> loadExistingAggregate(String franchiseId) {

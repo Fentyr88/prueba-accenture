@@ -27,7 +27,7 @@ public class FranchisePersistenceAdapter implements FranchisePersistencePort {
                         mapper.toBranchEntities(franchise),
                         mapper.toProductEntities(franchise)
                 )
-                .then(findById(franchise.getId()));
+                .thenReturn(franchise);
     }
 
     @Override

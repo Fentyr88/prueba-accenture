@@ -9,6 +9,10 @@ public record Name(String value) {
         if (normalized.length() < 2 || normalized.length() > 30) {
             throw new IllegalArgumentException("Name must be between 2 and 30 characters");
         }
+        if (!normalized.matches("^[\\p{L}0-9\\s,.-]+$")) {
+            throw new IllegalArgumentException("Name contains invalid characters");
+        }
+
         value = normalized;
     }
 

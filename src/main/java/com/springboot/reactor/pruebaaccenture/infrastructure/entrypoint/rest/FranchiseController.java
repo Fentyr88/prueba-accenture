@@ -1,9 +1,7 @@
 package com.springboot.reactor.pruebaaccenture.infrastructure.entrypoint.rest;
 
 import com.springboot.reactor.pruebaaccenture.application.dto.request.*;
-import com.springboot.reactor.pruebaaccenture.application.dto.response.ApiResponse;
-import com.springboot.reactor.pruebaaccenture.application.dto.response.FranchiseResponse;
-import com.springboot.reactor.pruebaaccenture.application.dto.response.TopStockProductResponse;
+import com.springboot.reactor.pruebaaccenture.application.dto.response.*;
 import com.springboot.reactor.pruebaaccenture.application.port.in.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -57,6 +55,7 @@ public class FranchiseController {
         return createFranchiseUseCase.createFranchise(request.name())
                 .map(data -> ResponseEntity.status(HttpStatus.CREATED)
                         .body(new ApiResponse<>(201, "Franchise created", data)));
+
     }
 
     @GetMapping
@@ -66,7 +65,7 @@ public class FranchiseController {
     }
 
     @PostMapping("/{franchiseId}/branches")
-    public Mono<ResponseEntity<ApiResponse<FranchiseResponse>>> addBranch(
+    public Mono<ResponseEntity<ApiResponse<BranchResponse>>> addBranch(
             @PathVariable String franchiseId,
             @Valid @RequestBody AddBranchRequest request
     ) {
@@ -76,7 +75,7 @@ public class FranchiseController {
     }
 
     @PostMapping("/{franchiseId}/branches/{branchId}/products")
-    public Mono<ResponseEntity<ApiResponse<FranchiseResponse>>> addProduct(
+    public Mono<ResponseEntity<ApiResponse<ProductResponse>>> addProduct(
             @PathVariable String franchiseId,
             @PathVariable String branchId,
             @Valid @RequestBody AddProductRequest request
@@ -95,7 +94,7 @@ public class FranchiseController {
     }
 
     @PatchMapping("/{franchiseId}/branches/{branchId}/products/{productId}/stock")
-    public Mono<ResponseEntity<ApiResponse<FranchiseResponse>>> updateStock(
+    public Mono<ResponseEntity<ApiResponse<ProductResponse>>> updateStock(
             @PathVariable String franchiseId, @PathVariable String branchId, @PathVariable String productId,
             @Valid @RequestBody UpdateStockRequest request
     ) {
@@ -112,7 +111,7 @@ public class FranchiseController {
     }
 
     @PutMapping("/{franchiseId}/branches/{branchId}/name")
-    public Mono<ResponseEntity<ApiResponse<FranchiseResponse>>> updateBranchName(
+    public Mono<ResponseEntity<ApiResponse<BranchResponse>>> updateBranchName(
             @PathVariable String franchiseId, @PathVariable String branchId, @Valid @RequestBody UpdateNameRequest request
     ) {
         return updateBranchNameUseCase.updateBranchName(franchiseId, branchId, request.name())
@@ -120,7 +119,7 @@ public class FranchiseController {
     }
 
     @PutMapping("/{franchiseId}/branches/{branchId}/products/{productId}/name")
-    public Mono<ResponseEntity<ApiResponse<FranchiseResponse>>> updateProductName(
+    public Mono<ResponseEntity<ApiResponse<ProductResponse>>> updateProductName(
             @PathVariable String franchiseId, @PathVariable String branchId, @PathVariable String productId,
             @Valid @RequestBody UpdateNameRequest request
     ) {

@@ -5,7 +5,7 @@ import com.springboot.reactor.pruebaaccenture.domain.model.Branch;
 import com.springboot.reactor.pruebaaccenture.domain.model.Franchise;
 import com.springboot.reactor.pruebaaccenture.domain.model.Product;
 
-import java.util.Optional;
+import java.util.List;
 
 public final class FranchiseMapper {
     private FranchiseMapper() {}
@@ -30,12 +30,14 @@ public final class FranchiseMapper {
         return new ProductResponse(product.getId().value(), product.getName().value(), product.getStock().value());
     }
 
-    public static Optional<TopStockProductResponse> toTopStockResponse(Franchise franchise, Branch branch) {
-        return branch.topStockProduct().map(product -> new TopStockProductResponse(
-                franchise.getId().value(), franchise.getName().value(),
-                branch.getId().value(), branch.getName().value(),
-                product.getId().value(), product.getName().value(),
-                product.getStock().value()
-        ));
+    public static List<TopStockProductResponse> toTopStockResponse(Franchise franchise, Branch branch) {
+        return branch.topStockProducts().stream()
+                .map(product -> new TopStockProductResponse(
+                        franchise.getId().value(), franchise.getName().value(),
+                        branch.getId().value(), branch.getName().value(),
+                        product.getId().value(), product.getName().value(),
+                        product.getStock().value()
+                ))
+                .toList();
     }
 }

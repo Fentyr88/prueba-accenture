@@ -6,10 +6,7 @@ import com.springboot.reactor.pruebaaccenture.domain.vo.Id;
 import com.springboot.reactor.pruebaaccenture.domain.vo.Name;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Getter
 public class Branch {
@@ -61,7 +58,18 @@ public class Branch {
         target.updateName(updatedName);
     }
 
-    public Optional<Product> topStockProduct() {
-        return products.stream().max(Comparator.comparingInt(product -> product.getStock().value()));
+    public List<Product> topStockProducts() {
+        if (products.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        int maxStock = products.stream()
+                .mapToInt(product -> product.getStock().value())
+                .max()
+                .orElse(0);
+
+        return products.stream()
+                .filter(product -> product.getStock().value() == maxStock)
+                .toList();
     }
 }
