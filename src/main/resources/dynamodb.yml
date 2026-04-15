@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: DynamoDB table for Franchise service (sin GSI)
+Description: DynamoDB table for Franchise service
 
 Parameters:
   TableName:
