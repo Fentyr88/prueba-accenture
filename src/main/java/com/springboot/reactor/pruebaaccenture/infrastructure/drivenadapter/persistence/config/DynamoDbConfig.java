@@ -12,6 +12,8 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 
+import java.net.URI;
+
 @Configuration
 public class DynamoDbConfig {
 
@@ -19,14 +21,20 @@ public class DynamoDbConfig {
     public DynamoDbAsyncClient dynamoDbAsyncClient(
             @Value("${aws.region}") String region,
             @Value("${aws.credentials.access-key}") String accessKey,
-            @Value("${aws.credentials.secret-key}") String secretKey
+            @Value("${aws.credentials.secret-key}") String secretKey,
+            @Value("${aws.dynamodb.endpoint:}") String endpoint
     ) {
         var credentials = AwsBasicCredentials.create(accessKey, secretKey);
 
-        return DynamoDbAsyncClient.builder()
+        var builder = DynamoDbAsyncClient.builder()
                 .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                .build();
+                .credentialsProvider(StaticCredentialsProvider.create(credentials));
+
+        if (endpoint != null && !endpoint.isBlank()) {
+            builder.endpointOverride(URI.create(endpoint));
+        }
+
+        return builder.build();
     }
 
     @Bean
