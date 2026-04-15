@@ -21,11 +21,6 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, message, exchange);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, InvalidStockException.class})
-    public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex, ServerWebExchange exchange) {
-        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), exchange);
-    }
-
     @ExceptionHandler(DuplicateNameException.class)
     public ResponseEntity<ErrorResponse> handleConflict(DuplicateNameException ex, ServerWebExchange exchange) {
         return build(HttpStatus.CONFLICT, ex.getMessage(), exchange);
